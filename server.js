@@ -4,7 +4,6 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const botMessage = data.response.message;
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, "public")));
