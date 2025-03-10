@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayanfe Ai Chat Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            transition: background 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: #121212;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .chat-container {
+            width: 100%;
+            height: 80vh;
+            max-width: 100%;
+            background: #121212;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            text-align: right;
+        }
+
+        .ai-message {
+            background-color: black;
+            color: white;
+            text-align: left;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: #888;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 10px;
+            background: #333;
+        }
+
+        .input-field {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        .send-btn {
+            margin-left: 10px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: #007bff;
+            color: white;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: white;
+            color: black;
+            font-weight: bold;
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .light-mode {
+            background-color: white;
+            color: black;
+        }
+
+        .light-mode .container {
+            background: #f1f1f1;
+            color: black;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .user-message {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .light-mode .ai-message {
+            background-color: black;
+            color: white;
+        }
+
+        .light-mode .timestamp {
+            color: #555;
+        }
+
+        .light-mode .input-container {
+            background: #f1f1f1;
+        }
+
+        .light-mode .input-field {
+            background: rgba(0, 0, 0, 0.1);
+            color: black;
+        }
+
+        .light-mode .send-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .light-mode .toggle-btn {
+            background: black;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="toggle-btn" onclick="toggleTheme()">Light Mode</button>
+
+    <div class="container" id="loginPage">
+        <h2>Login</h2>
+        <input type="text" class="input-field" id="loginUser" placeholder="Username">
+        <input type="password" class="input-field" id="loginPass" placeholder="Password">
+        <div class="auth-buttons">
+            <button class="btn" onclick="login()">Login</button>
+            <button class="btn" onclick="showSignup()">Sign Up</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="signupPage">
+        <h2>Sign Up</h2>
+        <input type="text" class="input-field" id="signupUser" placeholder="Username">
+        <input type="password" class="input-field" id="signupPass" placeholder="Password">
+        <div class="auth-buttons">
+            <button class="btn" onclick="signup()">Sign Up</button>
+            <button class="btn" onclick="showLogin()">Back to Login</button>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-container hidden" id="chatPage">
+        <div class="chat-box" id="chatBox">
+            <!-- Messages will be appended here -->
+        </div>
+        <div class="input-container">
+            <input type="text" class="input-field" id="userMessage" placeholder="Message">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+        <div class="auth-buttons">
+            <button class="btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle("light-mode");
+            let btn = document.querySelector(".toggle-btn");
+            btn.textContent = document.body.classList.contains("light-mode") ? "Dark Mode" : "Light Mode";
+        }
+
+        function showSignup() {
+            document.getElementById("loginPage").classList.add("hidden");
+            document.getElementById("signupPage").classList.remove("hidden");
+        }
+
+        function showLogin() {
+            document.getElementById("signupPage").classList.add("hidden");
+            document.getElementById("loginPage").classList.remove("hidden");
+        }
+
+        function login() {
+            let username = document.getElementById("loginUser").value;
+            let password = document.getElementById("loginPass").value;
+            let storedUser = localStorage.getItem("username");
+            let storedPass = localStorage.getItem("password");
+
+            if (username === storedUser && password === storedPass) {
+                alert("Login successful!");
+                document.getElementById("loginPage").classList.add("hidden");
+                document.getElementById("chatPage").classList.remove("hidden");
+            } else {
+                alert("Invalid credentials! Please sign up first.");
+            }
+        }
+
+        function signup() {
+            let username = document.getElementById("signupUser").value;
+            let password = document.getElementById("signupPass").value;
+
+            if (username && password) {
+                localStorage.setItem("username", username);
+                localStorage.setItem("password", password);
+                alert("Signup successful! Please login.");
+                showLogin();
+            } else {
+                alert("Please fill all fields.");
+            }
+        }
+
+        function logout() {
+            document.getElementById("chatPage").classList.add("hidden");
+            document.getElementById("loginPage").classList.remove("hidden");
+        }
+
+        function sendMessage() {
+            const chatBox = document.getElementById('chatBox');
+            const userMessage = document.getElementById('userMessage').value;
+
+            if (userMessage.trim() !== '') {
+                const userMessageElement = document.createElement('div');
+                userMessageElement.classList.add('message', 'user-message');
+                userMessageElement.textContent = userMessage;
+                chatBox.appendChild(userMessageElement);
+
+                const timeStampElement = document.createElement('span');
+                timeStampElement.classList.add('timestamp');
+                timeStampElement.textContent = new Date().toLocaleTimeString();
+                userMessageElement.appendChild(timeStampElement);
+
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiMessageElement = document.createElement('div');
+                    aiMessageElement.classList.add('message', 'ai-message');
+                    aiMessageElement.textContent = 'This is a response from the AI.';
+
+                    const aiTimeStampElement = document.createElement('span');
+                    aiTimeStampElement.classList.add('timestamp');
+                    aiTimeStampElement.textContent = new Date().toLocaleTimeString();
+                    aiMessageElement.appendChild(aiTimeStampElement);
+
+                    chatBox.appendChild(aiMessageElement);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 500);
+
+                document.getElementById('userMessage').value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // Check if user is already logged in
+        window.onload = function () {
+            let storedUser = localStorage.getItem("username");
+            if (storedUser) {
+                document.getElementById("loginPage").classList.add("hidden");
+                document.getElementById("chatPage").classList.remove("hidden");
+            }
+        };
+    </script>
+
+</body>
+  </html>
